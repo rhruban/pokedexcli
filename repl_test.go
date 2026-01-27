@@ -13,17 +13,22 @@ func TestCleanInput(t *testing.T) {
 			input: "  Hello world  ",
 			expected: []string{"hello","world"},
 		},
-		// TODO add more
+		{
+			input: "Bulbasaur Charmander    PICKACHU",
+			expected: []string{"bulbasaur","charmander","pickachu"},
+		},
 	}
 
 	for _, c := range cases {
 		actual := cleanInput(c.input)
-		// TODO Check length
+		if len(actual) != len(c.expected) {
+			t.Errorf("not same length")
+		}
 		for i := range actual {
 			word := actual[i]
 			expectedWord := c.expected[i]
 			if word != expectedWord {
-				t.Errorf("flail")
+				t.Errorf("not same words")
 			}
 		}
 	}
