@@ -9,6 +9,7 @@ import(
 
 func enterREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
+	cfg := getConfig()
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -23,7 +24,7 @@ func enterREPL() {
 			fmt.Println("Unkown command")
 			continue
 		} else {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -38,10 +39,24 @@ func cleanInput(text string) []string {
 	return words
 }
 
+type config struct {
+	prevLocURL *string
+	nextLocURL *string
+}
+
+func getConfig() *config {
+	baseURL := "https://pokeapi.co/api/v2/location-area/"
+	cfg := config{
+		prevLocURL: nil,
+		nextLocURL: &baseURL,
+	}
+	return &cfg
+}
+
 type cliCommand struct {
 	name				string
 	description	string
-	callback		func() error
+	callback		func(*config) error
 }
 
 func getCommands() map[string]cliCommand {

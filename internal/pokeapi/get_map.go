@@ -9,16 +9,16 @@ import(
 
 type LocationAreas struct {
 	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous any    `json:"previous"`
+	Next     *string `json:"next"`
+	Previous *string    `json:"previous"`
 	Results  []struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	} `json:"results"`
 }
 
-func GetMap(url string) LocationAreas {
-	res, err := http.Get(url)
+func GetMap(url *string) LocationAreas {
+	res, err := http.Get(*url)
 	if err != nil {
 		fmt.Println(err)
 	}
