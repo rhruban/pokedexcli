@@ -1,11 +1,42 @@
 package main
 
 import(
-	"strings"
+	"bufio"
 	"fmt"
 	"os"
-	"bufio"
+	"strings"
 )
+
+func enterREPL() {
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("Pokedex > ")
+		scanner.Scan()
+		userInput := scanner.Text()
+		cleanInputs := cleanInput(userInput)
+		if len(cleanInputs) == 0 {
+			continue
+		}
+		commandName := cleanInputs[0]
+		command, ok := getCommands()[commandName]
+		if !ok {
+			fmt.Println("Unkown command")
+			continue
+		} else {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
+		}
+	}
+}
+
+func cleanInput(text string) []string {
+	text = strings.ToLower(text)
+	words := strings.Fields(text)
+	return words
+}
 
 type cliCommand struct {
 	name				string
@@ -13,26 +44,8 @@ type cliCommand struct {
 	callback		func() error
 }
 
-var commands = map[string]cliCommand{}
-
-func commandExit() error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp() error {
-	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:")
-	fmt.Println("")
-	for _, value := range commands {
-		fmt.Printf("%v: %v\n", value.name, value.description)
-	}
-	return nil
-}
-
-func enterREPL() {
-	commands = map[string]cliCommand{
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
 		"exit": {
 			name: "exit",
 			description: "Exit the Pokedex",
@@ -44,24 +57,5 @@ func enterREPL() {
 			callback: commandHelp,
 		},
 	}
-	scanner := bufio.NewScanner(os.Stdin)
-	for {
-		fmt.Print("Pokedex > ")
-		scanner.Scan()
-		userInput := scanner.Text()
-		cleanInputs := cleanInput(userInput)
-		command, ok := commands[cleanInputs[0]]
-		if !ok {
-			fmt.Println("Unkown command")
-		} else {
-			command.callback()
-			fmt.Printf("Your command was: %s\n", cleanInputs[0])
-		}
-	}
 }
 
-func cleanInput(text string) []string {
-	text = strings.ToLower(text)
-	words := strings.Fields(text)
-	return words
-}
