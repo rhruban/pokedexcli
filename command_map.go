@@ -1,36 +1,42 @@
 package main
 
 import(
+	"errors"
 	"fmt"
-	"github.com/rhruban/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(cfg *config) error {
-	if cfg.nextLocURL == nil {
-		fmt.Println("you're on the last page")
-		return nil
+func commandMapf(cfg *config) error {
+	locs, err := cfg.pokeapiClient.ListLocations(cfg.nextLocURL)
+	if err != nil {
+		return err
 	}
-	locs := pokeapi.GetMap(cfg.nextLocURL)
+
+	cfg.prevLocURL = locs.Previous
+	cfg.nextLocURL = locs.Next
+
 	for i := range locs.Results {
 		fmt.Println(locs.Results[i].Name)
 	}
-	cfg.prevLocURL = locs.Previous
-	cfg.nextLocURL = locs.Next
+
 	return nil	
 }
 
 func commandMapb(cfg *config) error {
 	if cfg.prevLocURL == nil {
-		fmt.Println("you're on the first page")
-		return nil
+		return errors.New("you're on the first page")
 	}
-	locs := pokeapi.GetMap(cfg.prevLocURL)
+
+	locs, err := cfg.pokeapiClient.ListLocations(cfg.prevLocURL)
+	if err != nil {
+		return err
+	}
+
+	cfg.prevLocURL = locs.Previous
+	cfg.nextLocURL = locs.Next
+
 	for i := range locs.Results {
 		fmt.Println(locs.Results[i].Name)
 	}
-	cfg.prevLocURL = locs.Previous
-	cfg.nextLocURL = locs.Next
-	return nil	
-	fmt.Println("Did a mapb")
+
 	return nil	
 }
