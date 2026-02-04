@@ -58,7 +58,9 @@ func (c *Cache) reap(now time.Time, interval time.Duration) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for key, val := range c.cache {
-		// TODO delete logic
+		if val.createdAt.Before(now.Add(-interval)) {
+			delete(c.cache,key)
+		}
 	}
 }
 
