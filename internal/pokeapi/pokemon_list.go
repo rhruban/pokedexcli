@@ -2,16 +2,12 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 )
 
-func (c *Client) ListLocationPokemon(area *string) (RespLocationDetails, error) {
-	if area == nil {
-		return RespLocationDetails{}, errors.New("Explore needs arg")
-	}
-	url := baseURL + "/location-area/" + *area
+func (c *Client) ListLocationPokemon(area string) (RespLocationDetails, error) {
+	url := baseURL + "/location-area/" + area
 	
 	if val, ok := c.cache.Get(url); ok {
 		locs := RespLocationDetails{}

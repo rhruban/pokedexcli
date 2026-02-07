@@ -1,17 +1,25 @@
 package main
 
 import(
+	"errors"
 	"fmt"
 )
 
-func commandExplore(cfg *config, arg1 *string) error {
-	locs, err := cfg.pokeapiClient.ListLocationPokemon(arg1)
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("you must provide a single location name")
+	}
+
+	name := args[0]
+	locs, err := cfg.pokeapiClient.ListLocationPokemon(name)
 	if err != nil {
 		return err
 	}
 
+	fmt.Printf("Exploring %s...\n", locs.Name)
+	fmt.Println("Found Pokemon: ")
 	for i := range locs.PokemonEncounters {
-		fmt.Println(locs.PokemonEncounters[i].Pokemon.Name)
+		fmt.Printf(" - %s\n", locs.PokemonEncounters[i].Pokemon.Name)
 	}
 
 	return nil	

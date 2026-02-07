@@ -21,11 +21,9 @@ func enterREPL(cfg *config) {
 		}
 
 		commandName := cleanInputs[0]
-		var arg1 *string
+		args := []string{}
 		if len(cleanInputs) > 1 {
-			arg1 = &(cleanInputs[1])
-		} else {
-			arg1 = nil
+			args = cleanInputs[1:]
 		}
 
 		command, ok := getCommands()[commandName]
@@ -33,7 +31,7 @@ func enterREPL(cfg *config) {
 			fmt.Println("Unkown command")
 			continue
 		} else {
-			err := command.callback(cfg, arg1)
+			err := command.callback(cfg, args...)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -57,7 +55,7 @@ type config struct {
 type cliCommand struct {
 	name				string
 	description	string
-	callback		func(*config, *string) error
+	callback		func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -83,7 +81,7 @@ func getCommands() map[string]cliCommand {
 			callback: commandMapb,
 		},
 		"explore": {
-			name: "explore",
+			name: "explore <location_name>",
 			description: "Display pokemon that can be encountered in a location area",
 			callback: commandExplore,
 		},
